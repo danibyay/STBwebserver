@@ -6,6 +6,8 @@ var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
 
 var subSocket = require('./lib/subscribe');
+var badges = require('./models/badges');
+
 
 //servers that don't render views, start on 8000
 //servers that do render views, start on 3000
@@ -27,9 +29,9 @@ app.get('/', function(req, res){
   res.sendfile('./public/index.html');
 });
 
-io.socket.on('connection', function(socket){
+io.sockets.on('connection', function(socket){
   //when a new browser connects
-  model.get(function(err, data){
+  badges.get(function(err, data){
     if(err) { return; }
     data.forEach(function(badge){
       socket.emit('badge', badge);
@@ -39,5 +41,5 @@ io.socket.on('connection', function(socket){
 
 //hook up our subsocket to socket.io
 subSocket.on('message', function(message){
-  io.socket.emit('badge', message);
+  io.sockets.emit('badge', message);
 });
